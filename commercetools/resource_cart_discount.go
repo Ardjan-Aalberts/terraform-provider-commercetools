@@ -138,6 +138,14 @@ func resourceCartDiscount() *schema.Resource {
 				ValidateFunc: validateStackingMode,
 				Default:      "Stacking",
 			},
+			"custom_type_id": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"custom": {
+				Type:     schema.TypeString,
+				Optional: true,
+			},
 			"version": {
 				Type:     schema.TypeInt,
 				Computed: true,
@@ -215,6 +223,11 @@ func resourceCartDiscountCreate(d *schema.ResourceData, m interface{}) error {
 		StackingMode:         stackingMode,
 	}
 
+	if val := d.Get("custom").(string); len(val) > 0 {
+		customFields := _decodeCustomFieldsValue(d.Get("custom_type_id").(string), d.Get("custom").(string))
+		draft.Custom = &customFields
+	}
+
 	if val := d.Get("target").(map[string]interface{}); len(val) > 0 {
 		target, err := resourceCartDiscountGetTarget(d)
 		if err != nil {
@@ -240,7 +253,6 @@ func resourceCartDiscountCreate(d *schema.ResourceData, m interface{}) error {
 
 	errorResponse := resource.Retry(1*time.Minute, func() *resource.RetryError {
 		var err error
-
 		cartDiscount, err = client.CartDiscountCreate(context.Background(), draft)
 
 		if err != nil {

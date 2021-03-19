@@ -59,6 +59,12 @@ func TestAccCartDiscountCreate_basic(t *testing.T) {
 					resource.TestCheckResourceAttr(
 						"commercetools_cart_discount.standard", "is_active", "true",
 					),
+					resource.TestCheckResourceAttr(
+						"commercetools_type.cart_discount_fields", "name.en", "standard name",
+					),
+					resource.TestCheckResourceAttr(
+						"commercetools_type.cart_discount_fields", "field.0.name", "cod",
+					),
 				),
 			},
 			{
@@ -161,6 +167,25 @@ func TestAccCartDiscountCreate_basic(t *testing.T) {
 
 func testAccCartDiscountConfig() string {
 	return `
+	resource "commercetools_type" "cart_discount_fields" {
+	  key = "cart_discount_fields"
+	
+	  resource_type_ids = ["cart-discount"]
+
+	  name = {
+	    en = "standard name"
+	  }
+	
+	  field {
+		name = "cod"
+		label = {
+		  en = "Is cash on delivery"
+		}
+		type {
+		  name = "Boolean"
+		}
+	  }
+	}
 	resource "commercetools_cart_discount" "standard" {
 		key = "standard"
 		name = {
@@ -179,17 +204,39 @@ func testAccCartDiscountConfig() string {
 		  type      = "lineItems"
 		  predicate = "1=1"
 		}
-
 		value {
 			type      = "relative"
 			permyriad = 1000
 		}
+		custom_type_id = "${commercetools_type.cart_discount_fields.id}"
+		custom = jsonencode({
+			cod = true
+		})
 	  }
 	  `
 }
 
 func testAccCartDiscountUpdate() string {
 	return `
+	resource "commercetools_type" "cart_discount_fields" {
+	  key = "cart_discount_fields"
+	
+	  resource_type_ids = ["cart-discount"]
+
+	  name = {
+	    en = "standard name"
+	  }
+	
+	  field {
+		name = "cod"
+		label = {
+		  en = "Is cash on delivery"
+		}
+		type {
+		  name = "Boolean"
+		}
+	  }
+	}
 	resource "commercetools_cart_discount" "standard" {
 		key = "standard_new"
 		name = {
@@ -208,19 +255,40 @@ func testAccCartDiscountUpdate() string {
 			type      = "lineItems"
 			predicate = "1=1"
 		}
-		
 		value {
 			type      = "relative"
 			permyriad = 1000
 		}
-
 		is_active = false
+		custom_type_id = "${commercetools_type.cart_discount_fields.id}"
+		custom = jsonencode({
+			cod = true
+		})
 	  }
 	  `
 }
 
 func testAccCartDiscountRemoveProperties() string {
 	return `
+	resource "commercetools_type" "cart_discount_fields" {
+	  key = "cart_discount_fields"
+	
+	  resource_type_ids = ["cart-discount"]
+
+	  name = {
+	    en = "standard name"
+	  }
+	
+	  field {
+		name = "cod"
+		label = {
+		  en = "Is cash on delivery"
+		}
+		type {
+		  name = "Boolean"
+		}
+	  }
+	}
 	resource "commercetools_cart_discount" "standard" {
 		key = "standard_new"
 		name = {

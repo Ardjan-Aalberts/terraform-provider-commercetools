@@ -312,3 +312,17 @@ func ValidateCurrencyCode(val interface{}, key string) (warns []string, errs []e
 func expandDate(input string) (time.Time, error) {
 	return time.Parse(time.RFC3339, input)
 }
+
+func _decodeCustomFieldsValue(resourceKey string, value string) commercetools.CustomFields {
+	data := make(commercetools.FieldContainer)
+	_ = json.Unmarshal([]byte(value), &data)
+
+	fields := commercetools.CustomFields{
+		Type: &commercetools.TypeReference{
+			ID: resourceKey,
+		},
+		Fields: &data,
+	}
+
+	return fields
+}
