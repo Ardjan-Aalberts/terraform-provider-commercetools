@@ -46,10 +46,6 @@ func resourceCategory() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 			},
-			"external_id": {
-				Type:     schema.TypeString,
-				Optional: true,
-			},
 			"meta_title": {
 				Type:     TypeLocalizedString,
 				Optional: true,
@@ -149,7 +145,6 @@ func resourceCategoryCreate(d *schema.ResourceData, m interface{}) error {
 		Description:     &desc,
 		Slug:            &slug,
 		OrderHint:       d.Get("order_hint").(string),
-		ExternalID:      d.Get("external_id").(string),
 		MetaTitle:       &metaTitle,
 		MetaDescription: &metaDescription,
 		MetaKeywords:    &metaKeywords,
@@ -220,7 +215,6 @@ func resourceCategoryRead(d *schema.ResourceData, m interface{}) error {
 		d.Set("description", *category.Description)
 		d.Set("parent", category.Parent)
 		d.Set("order_hint", category.OrderHint)
-		d.Set("external_id", category.ExternalID)
 		if category.MetaTitle != nil {
 			d.Set("meta_title", *category.MetaTitle)
 		}
@@ -274,13 +268,6 @@ func resourceCategoryUpdate(d *schema.ResourceData, m interface{}) error {
 
 	if d.HasChange("order_hint") {
 		newVal := d.Get("order_hint").(string)
-		input.Actions = append(
-			input.Actions,
-			&commercetools.CategorySetKeyAction{Key: newVal})
-	}
-
-	if d.HasChange("external_id") {
-		newVal := d.Get("external_id").(string)
 		input.Actions = append(
 			input.Actions,
 			&commercetools.CategorySetKeyAction{Key: newVal})
